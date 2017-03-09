@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>G A L A X I A - Contact</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="icon" type="image/ico" href="favicon.ico" />
+  <link rel="stylesheet" href="main.css">
+</head>
+
+<body style="overflow: auto;">
+  <section id="contact">
+    <img src="assets/images/logo.png" class="galaxis-logo-large">
+    <img src="assets/images/logo-text.svg" class="galaxis-logo-text">
+    <h1>contact us</h1>
+    <div id="form">
+      <div class="form-column">
+        <div class="field">
+          <div class="error" id="name-error">Name is required</div>
+          <input type="text" id="name" name="name" placeholder="Name">
+        </div>
+
+        <div class="field">
+          <div class="error" id="email-error">Error in email address</div>
+          <input type="email" id="email" name="email" placeholder="E-Mail">
+        </div>
+      </div>
+      <div class="form-column">
+        <div class="field">
+          <div class="error" id="subject-error">Please select a subject</div>
+          <div class="select-container">
+            <select id="subject">
+              <option value="-1" disabled selected>Subject</option>
+              <option value="0">General</option>
+              <option value="1">Support</option>
+              <option value="2">Marketing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="error" id="message-error">Message is required</div>
+          <label for="message" class="top-label">Message</label>
+          <textarea id="message" name="message"></textarea>
+        </div>
+      </div>
+      <button type="submit" class="button-send" id="send">Send</button>
+    </div>
+    <div id="form-messages" style="display: none;text-align: center;font-size: 20px;font-weight: bold;letter-spacing: 1px;margin-top: 50px;"></div>
+  </section>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.js"></script>
+  <script>
+  $('#send').on('click', function() {
+    if (validateName() && validateEmail() && validateSubject() && validateMessage()) {
+      var data = {
+        name: $('#name').val(),
+        email: $('#email').val(),
+        subject: $('#subject').val(),
+        message: $('#message').val()
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '//web-api.galaxis.co/contactmailer',
+        data: data
+      })
+      .done(function(response) {
+        console.log(response);
+        /*
+        // Make sure that the formMessages div has the 'success' class.
+        $('#formMessages').removeClass('error');
+        $('#formMessages').addClass('success');
+
+        // Set the message text.
+        $('#formMessages').text(response);
+
+        // Clear the form.
+        $('#name').val('');
+        $('#email').val('');
+        $('#subject').val('');
+        $('#message').val('');
+        */
+        $('#form-messages').text('Thank you for contacting us. We will get back to you soon!');
+        $('#form').css('display', 'none');
+        $('#form-messages').css('display', 'block');
+
+      })
+      .fail(function(data) {
+        // Set the message text.
+        if (data.responseText !== '') {
+          $('#form-messages').text(data.responseText);
+        }
+        else {
+          $('#form-messages').text('Error!');
+        }
+        $('#form').css('display', 'none');
+        $('#form-messages').css('display', 'block');
+      });
+    }
+  });
+
+  $('#name').blur(function(){ validateName(); });
+  $('#email').blur(function(){ validateEmail(); });
+  $('#subject').blur(function(){ validateSubject(); });
+  $('#message').blur(function(){ validateMessage(); });
+
+  function validateName(){
+    var name = $('#name').val();
+    if (name == null || name == "") {
+      $('#name-error').addClass('is-visible');
+      return false;
+    } else {
+      $('#name-error').removeClass('is-visible');
+      return true;
+    }
+  }
+
+  function validateEmail(){
+    var email = $('#email').val();
+    var re = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    if (email == null || email == "" || !re.test(email)) {
+      $('#email-error').addClass('is-visible');
+      return false;
+    } else {
+      $('#email-error').removeClass('is-visible');
+      return true;
+    }
+  }
+
+  function validateSubject(){
+    var subject = $('#subject').val();
+    if (subject == null || subject == "" || subject < 0) {
+      $('#subject-error').addClass('is-visible');
+      return false;
+    } else {
+      $('#subject-error').removeClass('is-visible');
+      return true;
+    }
+  }
+
+  function validateMessage(){
+    var message = $('#message').val();
+    if (message == null || message == "") {
+      $('#message-error').addClass('is-visible');
+      return false;
+    } else {
+      $('#message-error').removeClass('is-visible');
+      return true;
+    }
+  }
+  </script>
+</body>
